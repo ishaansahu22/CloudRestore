@@ -8,16 +8,29 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('index') }}">
-      <div class="brand-mark">CR</div>
-      <div class="brand-text">
-        CloudRestore
-        <small>AMAZON S3 OBJECT RECOVERY</small>
+    <div class="brand-group">
+      <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer" class="aws-badge-logo" title="Visit AWS (Amazon Web Services)">
+        <img src="{{ url_for('static', filename='aws-logo.svg') }}" alt="AWS Logo">
+      </a>
+      <div class="brand-divider"></div>
+      <a class="brand" href="{{ url_for('index') }}">
+        <div class="brand-mark">CR</div>
+        <div class="brand-text">
+          CloudRestore
+          <small>AMAZON S3 OBJECT RECOVERY</small>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-actions">
+      <div class="region-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>ap-southeast-2 (Sydney)</span>
       </div>
-    </a>
-    <div class="cloud-pill connected">
-      <span class="status-pulse"></span>
-      AMAZON S3 · Sydney
+      <div class="cloud-pill connected">
+        <span class="status-pulse"></span>
+        AWS CONNECTED
+      </div>
     </div>
   </header>
 
@@ -40,7 +53,7 @@
     {% endwith %}
 
     <a class="back-link" href="{{ url_for('index') }}">
-      ← Back to Bucket Dashboard
+      ← Back to Bucket Console
     </a>
 
     <section class="hero" style="min-height: auto; padding: 28px 36px;">
@@ -49,7 +62,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
           S3 RECOVERY POINTS · {{ bucket }}
         </div>
-        <h1 style="font-size: 26px; margin-bottom: 6px;">Version History for <span style="color: #38bdf8;">{{ key }}</span></h1>
+        <h1 style="font-size: 26px; margin-bottom: 6px;">Version History for <span style="color: var(--aws-orange);">{{ key }}</span></h1>
         <p class="lede">Choose an S3 object version to download or restore. Restoring writes a verified SHA-256 copy as a brand new latest version while preserving all history.</p>
       </div>
       <div class="hero-stats-badge">
@@ -59,9 +72,9 @@
     </section>
 
     {% if truncated %}
-      <section class="setup-banner info-banner">
-        <strong>Version list is partial</strong>
-        <p>More than 1,000 versions matched this key. The displayed list is capped by S3 pagination.</p>
+      <section class="notice" style="background: var(--amber-subtle); color: #f59e0b; border: 1px solid var(--amber-border);">
+        <strong>Version list is partial:</strong>
+        <span>More than 1,000 versions matched this key. The displayed list is capped by S3 pagination.</span>
       </section>
     {% endif %}
 
@@ -92,7 +105,7 @@
               {% for version in versions %}
                 <tr>
                   <td>
-                    <span class="mono-tag" style="color: #0369a1; font-weight: 600;">
+                    <span class="mono-tag" style="color: var(--primary); font-weight: 600;">
                       {{ version.version_id }}
                     </span>
                   </td>
@@ -140,8 +153,13 @@
     </section>
 
     <footer>
-      <span>Restoring copies verified content to a new S3 version; prior versions remain preserved.</span>
-      <span>Amazon S3 · {{ bucket }}</span>
+      <div class="footer-aws-tag">
+        <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer">
+          <img src="{{ url_for('static', filename='aws-logo.svg') }}" alt="AWS Logo">
+        </a>
+        <span>Amazon Web Services · S3 Object Recovery</span>
+      </div>
+      <span>Target Bucket: {{ bucket }}</span>
     </footer>
   </main>
 </body>

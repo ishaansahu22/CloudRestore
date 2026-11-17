@@ -3,40 +3,66 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CloudRestore · S3 Object Recovery Dashboard</title>
+  <title>CloudRestore · AWS S3 Object Recovery Console</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <!-- AWS Top Navigation Bar -->
   <header class="topbar">
-    <a class="brand" href="{{ url_for('index') }}">
-      <div class="brand-mark">CR</div>
-      <div class="brand-text">
-        CloudRestore
-        <small>AMAZON S3 OBJECT RECOVERY</small>
+    <div class="brand-group">
+      <!-- Official AWS Logo Link -->
+      <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer" class="aws-badge-logo" title="Visit AWS (Amazon Web Services)">
+        <img src="{{ url_for('static', filename='aws-logo.svg') }}" alt="AWS Logo">
+      </a>
+      <div class="brand-divider"></div>
+      <a class="brand" href="{{ url_for('index') }}">
+        <div class="brand-mark">CR</div>
+        <div class="brand-text">
+          CloudRestore
+          <small>AMAZON S3 OBJECT RECOVERY</small>
+        </div>
+      </a>
+    </div>
+
+    <!-- Header Browse / Search Bar (AWS Console Style) -->
+    <div class="header-browse-bar">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="quickBrowseInput" placeholder="Browse S3 objects, versions, and activity..." onkeyup="filterObjects(this.value)">
+      <span class="browse-pill">[Alt+S]</span>
+    </div>
+
+    <!-- Header Right Actions & Badges -->
+    <div class="header-actions">
+      <div class="region-pill" title="Target AWS Region">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>{{ dashboard.region }}</span>
       </div>
-    </a>
-    <div class="cloud-pill {{ 'connected' if dashboard.connected else 'disconnected' }}">
-      <span class="status-pulse"></span>
-      AWS {{ 'CONNECTED' if dashboard.connected else 'DISCONNECTED' }}
+
+      <div class="cloud-pill {{ 'connected' if dashboard.connected else 'disconnected' }}">
+        <span class="status-pulse"></span>
+        AWS {{ 'CONNECTED' if dashboard.connected else 'DISCONNECTED' }}
+      </div>
     </div>
   </header>
 
   <main class="shell">
+    <!-- Dark Mode Hero Banner with AWS Accents -->
     <section class="hero">
       <div>
         <div class="eyebrow">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-          AWS S3 OBJECT VERSIONING
+          AMAZON WEB SERVICES · S3 OBJECT RECOVERY
         </div>
-        <h1>Your files, with a way back.</h1>
-        <p class="lede">Store backups in a private Amazon S3 bucket, preserve object versions automatically with SSE-S3 encryption, and restore prior versions with SHA-256 integrity verification.</p>
+        <h1>Your files, backed by <span class="aws-highlight">Amazon S3</span>.</h1>
+        <p class="lede">Store backups in a dedicated private Amazon S3 bucket, preserve multi-point object versions automatically with SSE-S3 encryption, and restore prior versions with SHA-256 integrity verification.</p>
       </div>
       <div class="hero-stats-badge">
         <div class="icon-spin">↶</div>
-        <span>INSTANT<br>RECOVERY</span>
+        <span>POINT-IN-TIME<br>RECOVERY</span>
       </div>
     </section>
 
+    <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="notices">
@@ -55,17 +81,16 @@
     {% endwith %}
 
     {% if not ready %}
-      <section class="setup-banner">
-        <strong>AWS connection requires attention</strong>
-        <p>{{ setup_error }}</p>
-        <span>Configure the AWS CLI profile with <code>aws configure --profile cloudrestore</code>.</span>
+      <section class="notice error">
+        <strong>AWS connection requires attention:</strong>
+        <span>{{ setup_error }}</span>
       </section>
     {% endif %}
 
     {% if ready and dashboard.truncated %}
-      <section class="setup-banner info-banner">
-        <strong>Bucket listing is partial</strong>
-        <p>The dashboard loaded the first 1,000 S3 versions. Counts are lower bounds; file version history is queried per object.</p>
+      <section class="notice" style="background: var(--amber-subtle); color: #f59e0b; border: 1px solid var(--amber-border);">
+        <strong>Bucket listing is partial:</strong>
+        <span>The dashboard loaded the first 1,000 S3 versions. Counts are lower bounds; file version history is queried per object.</span>
       </section>
     {% endif %}
 
@@ -74,33 +99,33 @@
       <article class="status-card">
         <div class="status-label">
           <span>AWS Status</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
         <div class="status-value">
-          <span class="status-pulse" style="background: {{ '#059669' if dashboard.connected else '#e11d48' }};"></span>
+          <span class="status-pulse" style="background: {{ '#10b981' if dashboard.connected else '#f43f5e' }}; box-shadow: 0 0 8px {{ '#10b981' if dashboard.connected else '#f43f5e' }};"></span>
           {{ 'Connected' if dashboard.connected else 'Unavailable' }}
         </div>
-        <small>Region · {{ dashboard.region }}</small>
+        <small>Region · {{ dashboard.region }} (Sydney)</small>
       </article>
 
       <article class="status-card">
         <div class="status-label">
-          <span>S3 Target Bucket</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+          <span>Amazon S3 Bucket</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
         </div>
         <div class="status-value mono">{{ dashboard.bucket }}</div>
-        <small>Private general purpose bucket</small>
+        <small>Private General Purpose Bucket</small>
       </article>
 
       <article class="status-card">
         <div class="status-label">
-          <span>Object Versioning</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Bucket Versioning</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="status-value badge-pill" style="color: {{ '#059669' if dashboard.versioning == 'Enabled' else '#d97706' }};">
+        <div class="status-value badge-pill" style="color: {{ '#34d399' if dashboard.versioning == 'Enabled' else '#fbbf24' }};">
           ● {{ dashboard.versioning }}
         </div>
-        <small>Read directly from AWS S3 configuration</small>
+        <small>Direct from AWS S3 API Configuration</small>
       </article>
     </section>
 
@@ -108,37 +133,37 @@
     <section class="status-grid">
       <article class="status-card">
         <div class="status-label">
-          <span>Current Objects</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Active Objects</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
         <div class="status-value">{{ ('≥ ' if dashboard.truncated else '') ~ dashboard.objects if dashboard.objects is not none else 'Unavailable' }}</div>
-        <small>Active objects (excluding delete markers)</small>
+        <small>Latest versions that are not delete markers</small>
       </article>
 
       <article class="status-card">
         <div class="status-label">
           <span>Total S3 Versions</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
         </div>
         <div class="status-value">{{ ('≥ ' if dashboard.truncated else '') ~ dashboard.versions if dashboard.versions is not none else 'Unavailable' }}</div>
-        <small>Delete markers: {{ dashboard.delete_markers if dashboard.delete_markers is not none else 'Unavailable' }}</small>
+        <small>Delete markers recorded: {{ dashboard.delete_markers if dashboard.delete_markers is not none else '0' }}</small>
       </article>
 
       <article class="status-card">
         <div class="status-label">
           <span>Security & Encryption</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <div class="status-value badge-pill" style="color: #0284c7;">{{ dashboard.encryption }}</div>
+        <div class="status-value badge-pill" style="color: var(--aws-orange);">{{ dashboard.encryption }}</div>
         <small>{{ dashboard.public_access }}</small>
       </article>
     </section>
 
-    <!-- Upload Panel -->
+    <!-- Upload Dropzone Panel -->
     <section class="panel">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">BACKUP WORKFLOW</div>
+          <div class="eyebrow">S3 BACKUP WORKFLOW</div>
           <h2>Upload Object to S3</h2>
         </div>
         <span class="limit-tag">Max {{ max_upload_mb }} MiB</span>
@@ -152,7 +177,7 @@
           </div>
           <div class="upload-text-group">
             <strong id="filePrompt">Select or drag & drop a file to backup</strong>
-            <span id="fileSubtext">Uploading the same filename creates an immutable S3 version point</span>
+            <span id="fileSubtext">Uploading the same filename creates an immutable S3 recovery version</span>
           </div>
         </label>
         <button class="button primary" type="submit" id="uploadBtn" {% if not ready %}disabled{% endif %}>
@@ -162,11 +187,11 @@
       </form>
     </section>
 
-    <!-- Objects Table Panel -->
+    <!-- S3 Objects Table Panel -->
     <section class="panel">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">S3 BUCKET CONTENTS</div>
+          <div class="eyebrow">AMAZON S3 STORAGE</div>
           <h2>Bucket Objects <span class="count-pill">{{ dashboard.files|length if ready else '0' }}</span></h2>
         </div>
         <span class="live-tag"><i></i> LIVE S3 DATA</span>
@@ -174,7 +199,7 @@
 
       {% if ready and dashboard.files %}
         <div class="table-wrap">
-          <table>
+          <table id="objectsTable">
             <thead>
               <tr>
                 <th>Object Key</th>
@@ -190,7 +215,7 @@
                   <td>
                     <div class="file-cell">
                       <div class="file-icon">📄</div>
-                      <span>{{ file.key }}</span>
+                      <span class="file-name-text">{{ file.key }}</span>
                     </div>
                   </td>
                   <td class="muted-text">
@@ -292,19 +317,19 @@
       </section>
     </div>
 
-    <!-- Journal Panel -->
+    <!-- Activity Journal Panel -->
     <section class="panel">
       <div class="section-heading">
         <div>
           <div class="eyebrow">AUDIT JOURNAL</div>
           <h2>Local Activity History</h2>
         </div>
-        <span class="limit-tag">Persisted to instance/activity.jsonl</span>
+        <span class="limit-tag">instance/activity.jsonl</span>
       </div>
 
       {% if dashboard.activity %}
         <div class="table-wrap">
-          <table>
+          <table id="activityTable">
             <thead>
               <tr>
                 <th>Timestamp (UTC)</th>
@@ -325,7 +350,7 @@
                   </td>
                   <td><strong>{{ item.key }}</strong></td>
                   <td class="mono-tag muted-text">{{ item.version_id or item.source_version_id or '—' }}</td>
-                  <td class="mono-tag" style="color: #0369a1;">{{ (item.sha256[:20] ~ '…') if item.sha256 else '—' }}</td>
+                  <td class="mono-tag" style="color: var(--primary);">{{ (item.sha256[:20] ~ '…') if item.sha256 else '—' }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -338,9 +363,15 @@
       {% endif %}
     </section>
 
+    <!-- Footer with AWS Logo & Info -->
     <footer>
-      <span>CloudRestore · Amazon S3 Object Recovery</span>
-      <span>Bucket: {{ dashboard.bucket }} (ap-southeast-2)</span>
+      <div class="footer-aws-tag">
+        <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer">
+          <img src="{{ url_for('static', filename='aws-logo.svg') }}" alt="AWS Logo">
+        </a>
+        <span>CloudRestore · Backed by Amazon Web Services S3 (Sydney · ap-southeast-2)</span>
+      </div>
+      <span>Bucket: {{ dashboard.bucket }}</span>
     </footer>
   </main>
 
@@ -355,6 +386,24 @@
         document.getElementById('fileSubtext').innerText = 'Selected (' + sizeFormatted + ') — ready to upload';
       }
     }
+
+    function filterObjects(query) {
+      query = query.toLowerCase().trim();
+      const rows = document.querySelectorAll('#objectsTable tbody tr, #activityTable tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Keyboard shortcut [Alt+S] to focus browse bar
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        const input = document.getElementById('quickBrowseInput');
+        if (input) input.focus();
+      }
+    });
   </script>
 </body>
 </html>
