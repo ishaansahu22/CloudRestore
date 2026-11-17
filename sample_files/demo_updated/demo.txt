@@ -1,0 +1,5 @@
+CloudRestore Test File
+Version: 2.0 (MODIFIED)
+Status: Overwritten content for versioning test.
+Testing AWS S3 version history, delete markers, and SHA-256 verification.
+

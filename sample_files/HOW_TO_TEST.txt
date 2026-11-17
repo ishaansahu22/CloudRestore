@@ -1,0 +1,27 @@
+HOW TO TEST CLOUDRESTORE:
+===========================
+
+1. First Upload Test:
+   - Go to http://127.0.0.1:5000
+   - Upload 'demo.txt' from this folder.
+   - You will see it appear in the dashboard with Version Count = 1.
+
+2. S3 Versioning Test (Overwriting same filename):
+   - Upload 'demo.txt' from the 'demo_updated/' subfolder (same filename, modified content).
+   - In CloudRestore, the version count will increment to 2.
+   - Click "History" -> you will see both S3 version IDs.
+
+3. Download & SHA-256 Verification:
+   - On the History page, click "Download" on the older version.
+   - CloudRestore verifies the SHA-256 digest on S3 before downloading.
+
+4. Restore Test:
+   - Click "Restore" next to the older version.
+   - S3 creates a new latest version with the verified content.
+
+5. S3 Delete Marker Test:
+   - Return to the dashboard and click "Delete".
+   - S3 adds a Delete Marker (non-destructive).
+   - The file status will display "Deleted · Recoverable".
+   - Click "Recover" to restore any past version!
+

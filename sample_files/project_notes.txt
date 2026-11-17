@@ -1,0 +1,9 @@
+CloudRestore Project Summary
+-----------------------------
+Cloud Provider: Amazon Web Services (AWS)
+Target Region: ap-southeast-2 (Sydney)
+Bucket Storage: Amazon S3 Standard (General Purpose)
+Encryption: Server-Side Encryption with Amazon S3 Managed Keys (SSE-S3 / AES-256)
+Integrity: End-to-end SHA-256 full object verification
+Version Control: Multi-version recovery points enabled
+

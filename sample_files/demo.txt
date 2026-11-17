@@ -1,0 +1,5 @@
+CloudRestore Test File
+Version: 1.0
+Status: Initial backup
+Preserving state in AWS S3 (ap-southeast-2 Sydney).
+
