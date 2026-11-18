@@ -1,0 +1,37 @@
+{
+  "project": "CloudRestore",
+  "cloud_provider": "Amazon Web Services (AWS)",
+  "region": {
+    "code": "ap-southeast-2",
+    "name": "Asia Pacific (Sydney)",
+    "data_center": "AWS Sydney Region"
+  },
+  "storage": {
+    "service": "Amazon S3",
+    "bucket_name": "cloudrestore-files-2026-isha27-685320296049-ap-southeast-2-an",
+    "storage_class": "STANDARD",
+    "versioning": {
+      "status": "Enabled",
+      "mfa_delete": "Disabled"
+    },
+    "encryption": {
+      "algorithm": "AES256",
+      "type": "SSE-S3 (Server-Side Encryption with Amazon S3 managed keys)"
+    },
+    "public_access_block": {
+      "block_public_acls": true,
+      "ignore_public_acls": true,
+      "block_public_policy": true,
+      "restrict_public_buckets": true
+    }
+  },
+  "integrity_verification": {
+    "algorithm": "SHA-256",
+    "checksum_type": "FULL_OBJECT",
+    "metadata_header": "cloudrestore-sha256"
+  },
+  "access_control": {
+    "iam_identity": "arn:aws:iam::685320296049:user/cloudrestore-user",
+    "authentication": "AWS CLI Profile (cloudrestore)"
+  }
+}
